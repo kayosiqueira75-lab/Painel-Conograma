@@ -411,9 +411,34 @@
       grid-column: span 2;
     }
 
+    /* ESTILO DO CRONÔMETRO DE ESTUDOS */
+    .timer-card {
+      background-color: #131d31;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .timer-display {
+      font-size: 1.8rem;
+      font-weight: 800;
+      font-family: 'Courier New', Courier, monospace;
+      color: var(--accent);
+      letter-spacing: 2px;
+    }
+
+    .timer-controls {
+      display: flex;
+      gap: 0.4rem;
+    }
+
     @media print {
       body { background-color: #fff; color: #000; }
-      header, .dashboard-bar, .header-actions, .phase-selector, .panel-tabs { display: none !important; }
+      header, .dashboard-bar, .header-actions, .phase-selector, .panel-tabs, .timer-card { display: none !important; }
       .main-layout { display: block; height: auto; overflow: visible; }
       .column { overflow: visible; padding: 0; }
       .column-left, .column-right { border: none; background: transparent; }
@@ -429,30 +454,6 @@
       .column.active-mobile { display: flex; }
     }
   </style>
-/* ESTILO DO CRONÔMETRO DE ESTUDOS */
-.timer-card {
-  background-color: #131d31;
-  border: 1px solid var(--accent);
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.timer-display {
-  font-size: 1.8rem;
-  font-weight: 800;
-  font-family: 'Courier New', Courier, monospace;
-  color: var(--accent);
-  letter-spacing: 2px;
-}
-
-.timer-controls {
-  display: flex;
-  gap: 0.4rem;
-}
 </head>
 <body>
 
@@ -525,17 +526,19 @@
 
     <!-- RIGHT COLUMN -->
     <div class="column column-right" id="col-right">
-<!-- CARD DO CRONÔMETRO INTEGRADO -->
-<div class="timer-card">
-  <div>
-    <span style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">⏱️ Horas Líquidas de Estudo</span>
-    <div class="timer-display" id="timer-display">00:00:00</div>
-  </div>
-  <div class="timer-controls">
-    <button class="btn-accent" id="btn-timer-start" onclick="toggleTimer()">▶ Iniciar</button>
-    <button onclick="resetTimer()">⏹ Zerar</button>
-  </div>
-</div>
+      
+      <!-- CARD DO CRONÔMETRO INTEGRADO -->
+      <div class="timer-card">
+        <div>
+          <span style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">⏱️ Horas Líquidas de Estudo</span>
+          <div class="timer-display" id="timer-display">00:00:00</div>
+        </div>
+        <div class="timer-controls">
+          <button class="btn-accent" id="btn-timer-start" onclick="toggleTimer()">▶ Iniciar</button>
+          <button onclick="resetTimer()">⏹ Zerar</button>
+        </div>
+      </div>
+
       <div class="section-header">
         <h2>📈 Painel de Domínio & Fila de Acompanhamento</h2>
       </div>
@@ -690,45 +693,46 @@
   </div>
 
   <script>
-/* LÓGICA DO CRONÔMETRO */
-let timerInterval = null;
-let timerSeconds = 0;
+    /* LÓGICA DO CRONÔMETRO */
+    let timerInterval = null;
+    let timerSeconds = 0;
 
-function updateTimerDisplay() {
-  const hrs = Math.floor(timerSeconds / 3600).toString().padStart(2, '0');
-  const mins = Math.floor((timerSeconds % 3600) / 60).toString().padStart(2, '0');
-  const secs = (timerSeconds % 60).toString().padStart(2, '0');
-  document.getElementById('timer-display').innerText = `${hrs}:${mins}:${secs}`;
-}
+    function updateTimerDisplay() {
+      const hrs = Math.floor(timerSeconds / 3600).toString().padStart(2, '0');
+      const mins = Math.floor((timerSeconds % 3600) / 60).toString().padStart(2, '0');
+      const secs = (timerSeconds % 60).toString().padStart(2, '0');
+      document.getElementById('timer-display').innerText = `${hrs}:${mins}:${secs}`;
+    }
 
-function toggleTimer() {
-  const btn = document.getElementById('btn-timer-start');
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-    btn.innerText = '▶ Continuar';
-    btn.classList.add('btn-accent');
-  } else {
-    timerInterval = setInterval(() => {
-      timerSeconds++;
+    function toggleTimer() {
+      const btn = document.getElementById('btn-timer-start');
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        btn.innerText = '▶ Continuar';
+        btn.classList.add('btn-accent');
+      } else {
+        timerInterval = setInterval(() => {
+          timerSeconds++;
+          updateTimerDisplay();
+        }, 1000);
+        btn.innerText = '⏸ Pausar';
+        btn.classList.remove('btn-accent');
+      }
+    }
+
+    function resetTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      timerSeconds = 0;
       updateTimerDisplay();
-    }, 1000);
-    btn.innerText = '⏸ Pausar';
-    btn.classList.remove('btn-accent');
-  }
-}
+      const btn = document.getElementById('btn-timer-start');
+      btn.innerText = '▶ Iniciar';
+      btn.classList.add('btn-accent');
+    }
 
-function resetTimer() {
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
-  timerSeconds = 0;
-  updateTimerDisplay();
-  const btn = document.getElementById('btn-timer-start');
-  btn.innerText = '▶ Iniciar';
-  btn.classList.add('btn-accent');
-}
     const STORAGE_KEY = 'pmal_cronograma_painel_v1';
 
     const schedulePhases = {
@@ -875,7 +879,6 @@ function resetTimer() {
       document.getElementById('m-verdes').innerText = verdes;
       document.getElementById('m-recuperacao').innerText = recuperacao;
       
-      // Conta revisões ainda pendentes de 24h
       const pending24h = topicsData.filter(t => t.dataEstudo && !t.rev24hConcluida).length;
       document.getElementById('m-rev-24h').innerText = pending24h;
     }
@@ -946,7 +949,6 @@ function resetTimer() {
       });
     }
 
-    /* renderRevisions com suporte ao estado de conclusão de 24h */
     function renderRevisions() {
       const rev24Container = document.getElementById('rev-24h-container');
       const recContainer = document.getElementById('rev-recuperacao-container');
@@ -963,11 +965,10 @@ function resetTimer() {
         const perc = q > 0 ? (a / q) * 100 : 0;
         const level = getDomainLevel(t, perc);
 
-        // 24h Revision Logic
         if (t.dataEstudo) {
           has24h = true;
           const isDone = !!t.rev24hConcluida;
-          
+
           rev24Container.innerHTML += `
             <div class="block-item ${isDone ? 'rev-done' : 'rev'}">
               <div class="block-title">
@@ -982,7 +983,6 @@ function resetTimer() {
           `;
         }
 
-        // Fila de Recuperação (<70%)
         if (level === 'vermelho' && q >= 3) {
           hasRec = true;
           recContainer.innerHTML += `
@@ -1019,11 +1019,11 @@ function resetTimer() {
         <div style="display:flex; flex-direction:column; gap:0.5rem; font-size:0.825rem;">
           <p><strong>Questões Totais Resolvidas na Semana:</strong> ${totalQ}</p>
           <p><strong>Aproveitamento Geral:</strong> ${taxa}% de Acertos</p>
-          <p><strong>Check-up Ativo Mensal:</strong> Reservar 30-40 min no sábado para teste cumulativo de recuperação ativa sem consulta.</p>
+          <p><strong>Revisão de Sábado:</strong> Dedicada a varredura geral e nivelamento de déficits.</p>
           <p style="color:var(--accent); margin-top:0.5rem;"><strong>Sugestão de Prioridades para Próxima Semana:</strong></p>
           <ul style="padding-left:1.2rem; color:var(--text-muted);">
             <li>Focar nos tópicos classificados como <span style="color:var(--red);">Vermelho</span> na fila de recuperação.</li>
-            <li>Manter resoluções focadas na banca <strong>Cebraspe</strong> (estilo Certo/Errado).</li>
+            <li>Manter o foco absoluto na banca Cebraspe para a PMAL.</li>
           </ul>
         </div>
       `;
